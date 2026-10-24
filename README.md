@@ -31,6 +31,8 @@ La niebla densa de primera persona oculta completamente los objetos a partir de 
 
 El bastón apunta al suelo y comprueba el contacto contra la geometría de la escena. Al caminar golpea periódicamente; **Espacio** permite explorar estando quieto. Con el audio activado, el suelo liso produce un golpe grave, la guía direccional dos golpes agudos y las baldosas de advertencia tres golpes. Los obstáculos producen un golpe seco. Los sonidos se sintetizan localmente con Web Audio y no requieren micrófono.
 
+Cada contacto con una baldosa podotáctil genera dos ondas luminosas que se expanden desde el punto de impacto: doradas en la guía y ámbar en la advertencia. Funcionan también con el audio desactivado y destacan sobre la niebla. Con movimiento reducido se muestra un círculo fijo que se desvanece.
+
 Las preguntas escritas funcionan siempre; el micrófono requiere reconocimiento de voz compatible y permiso del navegador. La síntesis de voz utiliza las voces españolas instaladas. La representación con siluetas es una convención de la demo, no una representación universal de la ceguera.
 
 ## Validación

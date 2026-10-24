@@ -4,6 +4,7 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { START_POSITION, LOCKER_POSITION, movementDelta, stepPosition, nearTerminal, nearLocker, spatialHint, groundSurface } from './navigation.js';
 import { CaneAudio } from './cane-audio.js';
+import { GroundWaves } from './ground-waves.js';
 import './style.css';
 
 const $ = (id) => document.getElementById(id);
@@ -54,6 +55,7 @@ const contactRay = new THREE.Raycaster();
 const caneTipLocal = new THREE.Vector3(-.10, -1.64, -1.10);
 const caneTip = new THREE.Vector3();
 const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const groundWaves = new GroundWaves(scene, reducedMotion);
 const guide = [
   'Comienza el recorrido. Camina con W A S D o las flechas y arrastra la escena para mirar. Sigue la guía amarilla hasta el tótem.',
   'Estás frente al tótem. Ingresa tu código de cuatro dígitos y presiona OK, abajo a la derecha. Puedes probar con 2026.',
@@ -227,6 +229,7 @@ new GLTFLoader().load(`${import.meta.env.BASE_URL}models/baston-mano.glb`, ({ sc
 
 function setMode(value) {
   keys.clear();
+  groundWaves.clear();
   dragging = null;
   cameraTween = null;
   mode = value;
@@ -525,6 +528,7 @@ function tapCane(now, force = false) {
   const hit = contactRay.intersectObjects([...environmentMeshes, model], true)[0];
   if (!hit) return;
   const surface = hit.point.y > .18 ? 'obstacle' : groundSurface(hit.point.x, hit.point.z, groundTiles);
+  groundWaves.emit(hit.point, surface, now);
   if (audio) caneAudio.tap(surface);
   const labels = {
     floor: 'Suelo liso · Un golpe grave', guide: 'Guía podotáctil · Dos golpes agudos',
@@ -562,6 +566,7 @@ function animate() {
     updatePlayerProgress(now, moving);
   }
   if (hinge) hinge.rotation.y = THREE.MathUtils.damp(hinge.rotation.y,doorAngle,5,dt);
+  groundWaves.update(now, mode === 'first');
   if (mode === 'overview') controls.update();
   renderer.render(scene,camera);
 }
