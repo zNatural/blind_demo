@@ -27,6 +27,8 @@ El desplazamiento es manual. Las interacciones solo se habilitan cerca del tóte
 
 En primera persona el entorno se representa con siluetas oscuras. Al acercarte al tótem se destacan los números y referencias en relieve; la pantalla permanece negra. El botón de visión permite alternar con la vista de presentación iluminada.
 
+La niebla densa de primera persona oculta completamente los objetos a partir de 2,4 metros de profundidad de cámara, incluso al aumentar la iluminación. Los elementos próximos aparecen gradualmente al acercarte. La vista general mantiene una niebla lejana para presentar la distribución del recinto.
+
 El bastón apunta al suelo y comprueba el contacto contra la geometría de la escena. Al caminar golpea periódicamente; **Espacio** permite explorar estando quieto. Con el audio activado, el suelo liso produce un golpe grave, la guía direccional dos golpes agudos y las baldosas de advertencia tres golpes. Los obstáculos producen un golpe seco. Los sonidos se sintetizan localmente con Web Audio y no requieren micrófono.
 
 Las preguntas escritas funcionan siempre; el micrófono requiere reconocimiento de voz compatible y permiso del navegador. La síntesis de voz utiliza las voces españolas instaladas. La representación con siluetas es una convención de la demo, no una representación universal de la ceguera.

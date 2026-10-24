@@ -112,6 +112,10 @@ function applyVision() {
   renderer.toneMappingExposure = dark ? .65 : bright ? 1.9 : 1.45;
   scene.background.set(dark ? '#020403' : '#14231f');
   scene.fog.color.copy(scene.background);
+  // Dense first-person fog completely obscures distant geometry, including lights
+  // and raised labels. Keep the overview clear for presenting the room layout.
+  scene.fog.near = mode === 'first' ? .25 : 18;
+  scene.fog.far = mode === 'first' ? 2.4 : 38;
   screenMaterials.forEach(({ material, original, text }) => {
     material.copy(original);
     if (dark) {
