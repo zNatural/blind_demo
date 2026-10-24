@@ -171,7 +171,7 @@ function optimize(root) {
   remove.forEach((o) => o.removeFromParent());
 }
 
-new GLTFLoader().load(`${import.meta.env.BASE_URL}models/centro-accesible.glb`, (gltf) => {
+new GLTFLoader().load(`${import.meta.env.BASE_URL}models/centro-accesible.glb?v=catadores-de-uva`, (gltf) => {
   model = gltf.scene;
   // Blender cameras and lights are authoring aids; browser lighting is controlled here.
   const aids = [];
