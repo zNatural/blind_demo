@@ -13,7 +13,7 @@ Abre la dirección local que muestra Vite. `npm run build` genera `dist/`; `npm 
 
 ## Probar el retiro
 
-1. Activa el audio si deseas instrucciones habladas.
+1. En el diálogo inicial elige si quieres activar el audio y, opcionalmente, el micrófono. También puedes continuar sin dispositivos.
 2. Presiona **Comenzar recorrido** y camina con **WASD** o las flechas hasta el tótem. Arrastra para mirar; la cámara gira sobre tu posición.
 3. Ingresa **2026** con el teclado de la interfaz, el teclado físico o los botones 3D y confirma con **OK**.
 4. Camina por la guía hasta el **casillero 17**, en el módulo izquierdo. La puerta se abre cuando llegas.
@@ -34,6 +34,12 @@ El bastón apunta al suelo y comprueba el contacto contra la geometría de la es
 Cada contacto con una baldosa podotáctil genera dos ondas luminosas que se expanden desde el punto de impacto: doradas en la guía y ámbar en la advertencia. Funcionan también con el audio desactivado y destacan sobre la niebla. Con movimiento reducido se muestra un círculo fijo que se desvanece.
 
 Las preguntas escritas funcionan siempre; el micrófono requiere reconocimiento de voz compatible y permiso del navegador. La síntesis de voz utiliza las voces españolas instaladas. La representación con siluetas es una convención de la demo, no una representación universal de la ceguera.
+
+## Audio y dispositivos
+
+El diálogo de inicio activa el audio mediante un clic y reproduce dos golpes de prueba. El micrófono solo se solicita si se marca su casilla; la comprobación cierra inmediatamente la captura y la escucha comienza únicamente al pulsar **Preguntar por voz**. No se solicita cámara ni ubicación.
+
+**Configurar dispositivos** permite revisar las opciones durante el recorrido. **Probar sonido** reproduce dos golpes sin voz para comprobar la salida. Si el navegador pausa el audio al cambiar de pestaña o interrumpe su contexto, se intenta reanudar al volver o al interactuar; el control muestra **Reactivar audio** mientras no esté funcionando. Los contactos pendientes se agrupan para evitar una ráfaga al reanudar, y silenciar cancela los sonidos pendientes. El volumen del equipo o una pestaña silenciada deben ajustarse en el navegador o sistema.
 
 ## Validación
 

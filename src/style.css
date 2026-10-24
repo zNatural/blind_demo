@@ -20,3 +20,11 @@
 .experience.is-fullscreen #viewport{inset:0}.audio-actions{flex-wrap:wrap;row-gap:8px}
 
 .fullscreen-interaction.collect-only .keypad-panel{display:none}.blind-vision .fullscreen-interaction.collect-only{background:#111811ed!important;border-color:#48543d!important}.fullscreen-interaction.collect-only>.primary{margin-top:0}
+
+/* Startup device choice stays separate from the browser's native permission prompt. */
+#device-setup{width:min(480px,calc(100vw - 32px));max-height:calc(100dvh - 40px);overflow:auto;border:1px solid #cdd6bf;border-radius:14px;padding:30px;background:#f7f9f1;color:#213b2e;box-shadow:0 25px 90px #0007;font-family:inherit}
+#device-setup::backdrop{background:#050e0bd9;backdrop-filter:blur(7px)}
+#device-setup .eyebrow{margin-bottom:12px}#device-setup h2{font-size:29px;margin-bottom:12px}#device-description{font-size:13px;line-height:1.7;color:#65745d;margin-bottom:21px}
+.device-choice{display:flex;align-items:flex-start;gap:12px;padding:16px 14px;margin:11px 0;background:#edf2e3;border:1px solid #d7e0c9;border-radius:8px;cursor:pointer}.device-choice input{accent-color:#274c39;width:18px;height:18px;margin-top:2px;flex-shrink:0}.device-choice strong{display:block;font-size:13px;font-weight:650}.device-choice small{display:block;font-size:11px;line-height:1.7;color:#728065;margin-top:6px}.device-choice em{font-size:10px;color:#81916e;font-style:normal;font-weight:400;margin-left:6px}.device-choice:has(input:disabled){opacity:.6;cursor:default}
+#setup-status{font-size:11px;line-height:1.7;padding:10px 0;color:#526c43;min-height:37px}#device-setup .primary{margin-top:12px}#device-setup .text-btn{display:block;width:100%;padding:14px 8px}.device-note{font-size:10px;line-height:1.7;color:#8b947d;margin:10px 0 0}.device-note:empty{display:none}#audio-health{font-size:10px;line-height:1.6;color:#e8d19c;margin:9px 0 0;min-height:0}#audio-health[hidden]{display:none}
+@media(max-width:560px){#device-setup{padding:23px}.audio-card .audio-actions{gap:9px 13px}.audio-card .audio-actions button{font-size:8px}.audio-card:has(#audio-health:not([hidden])) .question-chips{display:none}}

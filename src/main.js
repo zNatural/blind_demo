@@ -5,6 +5,7 @@ import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { START_POSITION, LOCKER_POSITION, movementDelta, stepPosition, nearTerminal, nearLocker, spatialHint, groundSurface } from './navigation.js';
 import { CaneAudio } from './cane-audio.js';
 import { GroundWaves } from './ground-waves.js';
+import { requestMicrophoneAccess } from './device-access.js';
 import './style.css';
 
 const $ = (id) => document.getElementById(id);
@@ -49,7 +50,8 @@ const player = new THREE.Vector3(START_POSITION.x, 1.65, START_POSITION.z);
 const obstacles = [];
 const groundTiles = [], environmentMeshes = [], screenMaterials = [], reliefMaterials = [];
 const keys = new Set();
-const caneAudio = new CaneAudio();
+const caneAudio = new CaneAudio({ onStateChange: () => refreshAudioControls() });
+let pendingBegin = false, setupEpoch = 0, audioAttempt = 0, microphonePermission = 'unknown';
 let lastTap = 0, lastSurface = '', lastCaneContact = 0;
 const contactRay = new THREE.Raycaster();
 const caneTipLocal = new THREE.Vector3(-.10, -1.64, -1.10);
@@ -212,6 +214,7 @@ new GLTFLoader().load(`${import.meta.env.BASE_URL}models/centro-accesible.glb`, 
   $('loading').remove();
   updateInteraction();
   applyVision();
+  if (pendingBegin) { pendingBegin = false; begin(); }
 }, undefined, (error) => {
   console.error(error);
   $('loading').innerHTML = '<p>No se pudo cargar la escena 3D.</p><small>Recarga la página para volver a intentarlo.</small>';
@@ -360,19 +363,56 @@ $('overview').addEventListener('click', () => {
   if (started) speak('Vista general. Tu posición está guardada. Presiona Primera persona para continuar caminando.');
 });
 $('first-person').addEventListener('click', begin);
-function toggleSound() {
-  audio = !audio;
-  lastSurface = '';
-  $('sound').setAttribute('aria-pressed', String(audio));
-  $('sound').setAttribute('aria-label', audio ? 'Desactivar audio' : 'Activar audio');
-  $('sound').innerHTML = '♪ <span>Audio ' + (audio ? 'activado' : 'desactivado') + '</span>';
-  $('scene-sound').setAttribute('aria-pressed', String(audio));
-  $('scene-sound').textContent = audio ? '♪ Desactivar audio' : '♪ Activar audio';
-  if (audio) { void caneAudio.unlock(); speak($('instruction').textContent); }
-  else if ('speechSynthesis' in window) speechSynthesis.cancel();
+function refreshAudioControls() {
+  const ready = audio && caneAudio.state === 'running';
+  const label = !audio ? 'Activar audio' : ready ? 'Desactivar audio' : 'Reactivar audio';
+  $('sound').setAttribute('aria-pressed', String(ready));
+  $('sound').setAttribute('aria-label', label);
+  $('sound').innerHTML = '♪ <span>' + (!audio ? 'Audio desactivado' : ready ? 'Audio activado' : 'Audio en pausa') + '</span>';
+  $('scene-sound').setAttribute('aria-pressed', String(ready));
+  $('scene-sound').textContent = '♪ ' + label;
+  $('audio-health').hidden = !audio || ready;
+  $('audio-health').textContent = 'El audio está bloqueado o en pausa. Pulsa Reactivar audio o Probar sonido. Revisa también el volumen y que la pestaña no esté silenciada.';
+  const suffix = ready ? 'Audio activado' : audio ? 'Audio en pausa' : 'Audio desactivado';
+  if (!lastSurface) $('cane-status').textContent = 'Bastón listo · ' + suffix;
+  else $('cane-status').textContent = $('cane-status').textContent.replace(/ · Audio (activado|en pausa|desactivado)$/, '') + ' · ' + suffix;
 }
+
+function disableAudio() {
+  audio = false;
+  audioAttempt++;
+  caneAudio.cancel();
+  lastSurface = '';
+  if ('speechSynthesis' in window) speechSynthesis.cancel();
+  refreshAudioControls();
+}
+
+async function enableAudio({ test = false, announce = true } = {}) {
+  const attempt = ++audioAttempt;
+  audio = true;
+  const unlocking = caneAudio.unlock();
+  refreshAudioControls();
+  const ready = await unlocking;
+  if (attempt !== audioAttempt || !audio) return false;
+  lastSurface = '';
+  refreshAudioControls();
+  if (ready && test) await caneAudio.tap('guide');
+  if (ready && announce && !test) speak($('instruction').textContent);
+  return ready;
+}
+
+function toggleSound() {
+  if (audio && caneAudio.state === 'running') disableAudio();
+  else void enableAudio({ test: true });
+}
+
 $('sound').addEventListener('click', toggleSound);
 $('scene-sound').addEventListener('click', toggleSound);
+$('audio-test').addEventListener('click', () => {
+  void enableAudio({ test: true }).then((ready) => {
+    if (ready) $('instruction').textContent = 'Prueba de audio: debes oír dos golpes agudos. Si no los oyes, comprueba el volumen, la salida de sonido y que la pestaña no esté silenciada.';
+  });
+});
 $('repeat').addEventListener('click', () => speak($('instruction').textContent, true));
 $('contrast').addEventListener('click', () => {
   const bright = document.body.classList.toggle('bright');
@@ -385,24 +425,93 @@ $('vision').addEventListener('click', () => { blindVision = !blindVision; update
 document.querySelectorAll('[data-question]').forEach((button) => button.addEventListener('click', () => answer(button.dataset.question)));
 const Recognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 let recognition, listening = false;
+function updateMicButton() {
+  $('mic').textContent = listening ? '● Escuchando… Detener' : microphonePermission === 'denied' ? '♩ Micrófono bloqueado · Configurar' : '♩ Preguntar por voz';
+}
 $('mic').addEventListener('click', () => {
   if (!Recognition) { speak('Este navegador no permite reconocimiento de voz. Puedes usar los botones de preguntas que están debajo.'); return; }
   if (listening) { recognition.stop(); return; }
+  if (microphonePermission === 'denied') { showDeviceSetup(); return; }
   recognition = new Recognition();
   recognition.lang = 'es-CL'; recognition.interimResults = false;
   recognition.onresult = (event) => answer(event.results[0][0].transcript);
-  recognition.onerror = (event) => speak(event.error === 'not-allowed' ? 'El micrófono no está habilitado. Puedes permitirlo en tu navegador o usar las preguntas escritas.' : 'No pude escuchar la pregunta. Inténtalo otra vez o usa las preguntas escritas.');
-  recognition.onend = () => { listening = false; $('mic').textContent = '♩ Preguntar por voz'; };
+  recognition.onerror = (event) => {
+    if (event.error === 'not-allowed' || event.error === 'service-not-allowed') microphonePermission = 'denied';
+    speak(microphonePermission === 'denied' ? 'El micrófono no está habilitado. Puedes permitirlo en tu navegador o usar las preguntas escritas.' : 'No pude escuchar la pregunta. Inténtalo otra vez o usa las preguntas escritas.');
+  };
+  recognition.onend = () => { listening = false; updateMicButton(); };
   try {
     recognition.start(); listening = true; $('mic').textContent = '● Escuchando… Detener';
   } catch { speak('No fue posible iniciar el micrófono. Usa los botones de preguntas.'); }
 });
+
+function showDeviceSetup() {
+  keys.clear(); dragging = null;
+  recognition?.abort();
+  listening = false; updateMicButton();
+  $('setup-audio').checked = audio || !started;
+  $('setup-microphone').checked = microphonePermission === 'granted';
+  $('setup-status').textContent = 'Selecciona lo que quieras activar. También puedes explorar sin dispositivos.';
+  $('device-title').textContent = started ? 'Configura tus dispositivos' : 'Prepara tu experiencia';
+  $('setup-apply').disabled = false;
+  $('setup-apply').innerHTML = (started ? 'Guardar y continuar' : 'Activar y comenzar') + ' <span>→</span>';
+  if (!$('device-setup').open) $('device-setup').showModal();
+}
+
+function finishDeviceSetup() {
+  $('device-setup').close();
+  if (!started) {
+    if (loaded) begin();
+    else pendingBegin = true;
+  } else if (mode === 'first') viewport.focus({ preventScroll: true });
+}
+
+$('setup-apply').addEventListener('click', async () => {
+  const epoch = ++setupEpoch;
+  const useAudio = $('setup-audio').checked;
+  const useMicrophone = $('setup-microphone').checked && !$('setup-microphone').disabled;
+  $('setup-apply').disabled = true;
+  $('setup-status').textContent = useMicrophone ? 'Confirma el permiso de micrófono en el aviso del navegador. Puedes continuar sin dispositivos si prefieres.' : 'Activando y comprobando el audio…';
+  // Start both requests inside the user gesture, before awaiting either result.
+  const audioReady = useAudio ? enableAudio({ test: true, announce: false }) : (disableAudio(), Promise.resolve(false));
+  const microphoneReady = useMicrophone ? requestMicrophoneAccess() : Promise.resolve(null);
+  const [ready, microphone] = await Promise.all([audioReady, microphoneReady]);
+  if (epoch !== setupEpoch) return;
+  if (microphone) microphonePermission = microphone.state;
+  updateMicButton();
+  $('setup-apply').disabled = false;
+  const initialVisit = !started;
+  finishDeviceSetup();
+  const messages = [];
+  if (useAudio) messages.push(ready ? 'Audio activado. La prueba reproduce dos golpes.' : 'No se pudo activar el audio. Pulsa Reactivar audio o Probar sonido.');
+  if (microphone) messages.push(microphone.message);
+  if (initialVisit) messages.push(guide[0]);
+  if (messages.length) speak(messages.join(' '));
+});
+
+function skipDeviceSetup() {
+  setupEpoch++;
+  disableAudio();
+  finishDeviceSetup();
+}
+$('setup-skip').addEventListener('click', skipDeviceSetup);
+$('device-setup').addEventListener('cancel', (event) => {
+  event.preventDefault();
+  if (started) { setupEpoch++; finishDeviceSetup(); }
+  else skipDeviceSetup();
+});
+$('devices').addEventListener('click', showDeviceSetup);
+if (!Recognition || !navigator.mediaDevices?.getUserMedia || !window.isSecureContext) {
+  $('setup-microphone').disabled = true;
+  $('device-compatibility').textContent = 'Las preguntas por voz no están disponibles en este navegador. Las preguntas escritas y los sonidos del bastón siguen disponibles.';
+}
 
 const raycaster = new THREE.Raycaster(), pointer = new THREE.Vector2();
 let pointerDown;
 renderer.domElement.addEventListener('pointerdown', (e) => {
   pointerDown = { x: e.clientX, y: e.clientY };
   if (mode !== 'first' || e.button !== 0) return;
+  if (audio && caneAudio.state !== 'running') void caneAudio.unlock();
   viewport.focus({ preventScroll: true });
   dragging = { id: e.pointerId, x: e.clientX, y: e.clientY };
   renderer.domElement.setPointerCapture(e.pointerId);
@@ -431,6 +540,7 @@ renderer.domElement.addEventListener('pointerup', (e) => {
 
 const movementKeys = new Set(['KeyW', 'KeyA', 'KeyS', 'KeyD', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight']);
 window.addEventListener('keydown', (e) => {
+  if ($('device-setup').open) return;
   if (e.ctrlKey || e.metaKey || e.altKey || e.target.isContentEditable || /INPUT|TEXTAREA|SELECT/.test(e.target.tagName)) return;
   if (e.key === 'Escape' && (expandedFallback || document.fullscreenElement === experience)) {
     if (document.fullscreenElement === experience) void document.exitFullscreen().catch(() => {});
@@ -439,6 +549,7 @@ window.addEventListener('keydown', (e) => {
   }
   if (mode !== 'first') return;
   if (movementKeys.has(e.code)) {
+    if (audio && !e.repeat && caneAudio.state !== 'running') void caneAudio.unlock();
     e.preventDefault();
     keys.add(e.code);
     return;
@@ -456,7 +567,13 @@ window.addEventListener('keydown', (e) => {
 });
 window.addEventListener('keyup', (e) => keys.delete(e.code));
 window.addEventListener('blur', () => { keys.clear(); dragging = null; });
-document.addEventListener('visibilitychange', () => { keys.clear(); dragging = null; });
+document.addEventListener('visibilitychange', () => {
+  keys.clear(); dragging = null;
+  if (!document.hidden && audio) {
+    void caneAudio.unlock();
+    if ('speechSynthesis' in window) speechSynthesis.resume();
+  }
+});
 
 const experience = document.querySelector('.experience');
 const keypadPanel = document.querySelector('.keypad-panel');
@@ -578,3 +695,4 @@ const resize = new ResizeObserver(() => {
 resize.observe(viewport);
 updateInteraction();
 animate();
+showDeviceSetup();
