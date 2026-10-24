@@ -12,10 +12,10 @@ export class CaneAudio {
 
   get state() { return this.context?.state || 'inactive'; }
 
-  unlock() {
+  unlock({ userGesture = false } = {}) {
     const AudioContext = this.AudioContextClass || globalThis.AudioContext || globalThis.webkitAudioContext;
     if (!AudioContext) return Promise.resolve(false);
-    if (this.unlocking) return this.unlocking;
+    if (this.unlocking && !userGesture) return this.unlocking;
     try {
       if (!this.context || this.context.state === 'closed') {
         this.context = new AudioContext();
@@ -23,10 +23,14 @@ export class CaneAudio {
       }
       if (this.state === 'running') return Promise.resolve(true);
       // Call resume synchronously from the click/key event to retain user activation.
-      this.unlocking = Promise.resolve(this.context.resume())
+      const pending = Promise.resolve(this.context.resume())
         .then(() => this.state === 'running', () => false)
-        .finally(() => { this.unlocking = null; this.onStateChange(this.state); });
-      return this.unlocking;
+        .finally(() => {
+          if (this.unlocking === pending) this.unlocking = null;
+          this.onStateChange(this.state);
+        });
+      this.unlocking = pending;
+      return pending;
     } catch {
       this.onStateChange(this.state);
       return Promise.resolve(false);

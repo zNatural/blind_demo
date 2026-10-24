@@ -268,7 +268,7 @@ function begin() {
   if (!loaded) { speak('La escena todavía está cargando. Espera un momento.'); return; }
   const firstVisit = !started;
   started = true;
-  if (audio) void caneAudio.unlock();
+  if (audio) void caneAudio.unlock({ userGesture: true });
   $('start').textContent = completed ? 'Volver a explorar →' : 'Continuar en primera persona →';
   setMode('first');
   lastGuidance = 0;
@@ -390,7 +390,7 @@ function disableAudio() {
 async function enableAudio({ test = false, announce = true } = {}) {
   const attempt = ++audioAttempt;
   audio = true;
-  const unlocking = caneAudio.unlock();
+  const unlocking = caneAudio.unlock({ userGesture: true });
   refreshAudioControls();
   const ready = await unlocking;
   if (attempt !== audioAttempt || !audio) return false;
@@ -511,7 +511,7 @@ let pointerDown;
 renderer.domElement.addEventListener('pointerdown', (e) => {
   pointerDown = { x: e.clientX, y: e.clientY };
   if (mode !== 'first' || e.button !== 0) return;
-  if (audio && caneAudio.state !== 'running') void caneAudio.unlock();
+  if (audio && caneAudio.state !== 'running') void caneAudio.unlock({ userGesture: true });
   viewport.focus({ preventScroll: true });
   dragging = { id: e.pointerId, x: e.clientX, y: e.clientY };
   renderer.domElement.setPointerCapture(e.pointerId);
@@ -549,14 +549,14 @@ window.addEventListener('keydown', (e) => {
   }
   if (mode !== 'first') return;
   if (movementKeys.has(e.code)) {
-    if (audio && !e.repeat && caneAudio.state !== 'running') void caneAudio.unlock();
+    if (audio && !e.repeat && caneAudio.state !== 'running') void caneAudio.unlock({ userGesture: true });
     e.preventDefault();
     keys.add(e.code);
     return;
   }
   if (e.code === 'Space') {
     e.preventDefault();
-    if (!e.repeat) { if (audio) void caneAudio.unlock(); tapCane(performance.now(), true); }
+    if (!e.repeat) { if (audio) void caneAudio.unlock({ userGesture: true }); tapCane(performance.now(), true); }
     return;
   }
   if (e.repeat) return;

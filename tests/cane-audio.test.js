@@ -63,6 +63,18 @@ test('muting while audio resumes cancels queued sounds', async () => {
   assert.equal(audio.context.oscillators.length, 0);
 });
 
+test('a new click can retry resume even when a background attempt never resolves', async () => {
+  const audio = new CaneAudio({ AudioContextClass: FakeContext });
+  await audio.unlock();
+  audio.context.state = 'suspended';
+  audio.context.resume = () => new Promise(() => {});
+  void audio.unlock();
+  audio.context.resume = async () => { audio.context.state = 'running'; };
+  assert.equal(await audio.unlock({ userGesture: true }), true);
+  assert.equal(await audio.tap('guide'), true);
+  assert.equal(audio.context.oscillators.length, 2);
+});
+
 test('microphone setup requests audio only and immediately stops its tracks', async () => {
   let stopped = 0;
   const result = await requestMicrophoneAccess({ getUserMedia: async (constraints) => {
