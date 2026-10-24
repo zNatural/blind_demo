@@ -25,7 +25,7 @@ El desplazamiento es manual. Las interacciones solo se habilitan cerca del tóte
 
 ## Bastón y visión
 
-En primera persona el entorno se representa con siluetas oscuras. Al acercarte al tótem se destacan los números y referencias en relieve; la pantalla permanece negra. El botón de visión permite alternar con la vista de presentación iluminada.
+En primera persona el entorno se representa con siluetas oscuras. Al acercarte al tótem se destacan los números y referencias en relieve; su pantalla muestra en tiempo real los dígitos del código, permite borrarlos y confirma el casillero asignado. El botón de visión permite alternar con la vista de presentación iluminada.
 
 La niebla densa de primera persona oculta completamente los objetos a partir de 2,4 metros de profundidad de cámara, incluso al aumentar la iluminación. Los elementos próximos aparecen gradualmente al acercarte. La vista general mantiene una niebla lejana para presentar la distribución del recinto.
 

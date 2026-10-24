@@ -58,6 +58,31 @@ const caneTipLocal = new THREE.Vector3(-.10, -1.64, -1.10);
 const caneTip = new THREE.Vector3();
 const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const groundWaves = new GroundWaves(scene, reducedMotion);
+const terminalCanvas = document.createElement('canvas');
+terminalCanvas.width = 768; terminalCanvas.height = 640;
+const terminalTexture = new THREE.CanvasTexture(terminalCanvas);
+terminalTexture.colorSpace = THREE.SRGBColorSpace;
+const terminalDisplay = new THREE.Mesh(
+  new THREE.PlaneGeometry(.43, .36),
+  new THREE.MeshBasicMaterial({ map: terminalTexture, toneMapped: false })
+);
+terminalDisplay.name = 'LiveTerminalDisplay';
+terminalDisplay.position.set(0, 1.64, .319);
+scene.add(terminalDisplay);
+
+function drawTerminal() {
+  const context = terminalCanvas.getContext('2d');
+  context.fillStyle = '#071b14'; context.fillRect(0, 0, 768, 640);
+  context.textAlign = 'center';
+  context.fillStyle = '#bbd4ad'; context.font = '38px sans-serif';
+  context.fillText('CÓDIGO DE RETIRO', 384, 135);
+  context.fillStyle = '#f4ffdf'; context.font = 'bold 145px monospace';
+  context.fillText(code.padEnd(4, '—').split('').join(' '), 384, 340);
+  context.fillStyle = '#bbd4ad'; context.font = '30px sans-serif';
+  context.fillText(stage >= 2 ? 'VERIFICADO · CASILLERO 17' : 'INGRESA 4 DÍGITOS Y PULSA OK', 384, 510);
+  terminalTexture.needsUpdate = true;
+}
+drawTerminal();
 const guide = [
   'Comienza el recorrido. Camina con W A S D o las flechas y arrastra la escena para mirar. Sigue la guía amarilla hasta el tótem.',
   'Estás frente al tótem. Ingresa tu código de cuatro dígitos y presiona OK, abajo a la derecha. Puedes probar con 2026.',
@@ -86,6 +111,7 @@ function updateStage(next) {
   $('terminal-state').textContent = stage === 0 ? 'EN ESPERA' : stage === 1 ? 'INGRESA CÓDIGO' : 'VERIFICADO';
   $('scene-tag').innerHTML = '<i></i> ' + ['Una ruta que puedes sentir', 'Un teclado que puedes reconocer', 'Tu casillero está más cerca', 'Autonomía en cada paso'][stage];
   updateInteraction();
+  drawTerminal();
   speak(guide[stage]);
 }
 
@@ -296,6 +322,7 @@ function press(key) {
     return;
   } else if (code.length < 4) code += key;
   $('code-display').textContent = code.padEnd(4, '—').split('').join(' ');
+  drawTerminal();
   if (key !== 'BACK') speak('Dígito ' + key + '. ' + code.length + ' de 4.');
   else speak('Último dígito eliminado.');
   const object = model.getObjectByName('Key_' + key);
@@ -333,6 +360,7 @@ function reset() {
   if (parcel) parcel.visible = true;
   doorAngle = 0;
   $('code-display').textContent = '— — — —';
+  drawTerminal();
   $('keypad-status').textContent = 'Código de demostración: 2026';
   $('start').innerHTML = 'Comenzar recorrido <span>→</span>';
   $('collect').innerHTML = 'Retirar paquete <span>↗</span>';
