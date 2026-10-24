@@ -25,8 +25,10 @@ test('terminal and locker interactions require the corresponding proximity zone'
   assert.equal(nearTerminal({ x: 0, z: .6 }), true);
   assert.equal(nearTerminal({ x: 0, z: -.8 }), false);
   assert.equal(nearLocker({ x: 0, z: 1.8 }), false);
-  assert.equal(nearLocker({ x: -2.4, z: -.72 }), true);
-  assert.equal(nearLocker({ x: -3.6, z: -.72 }), true);
+  assert.equal(nearLocker({ x: 1.6, z: 1 }), true);
+  assert.equal(nearLocker({ x: 1.3, z: .7 }), true);
+  assert.equal(nearLocker({ x: 1.6, z: -.4 }), false);
+  assert.equal(nearLocker({ x: -3, z: 1 }), false);
 });
 
 test('spatial guidance uses the player heading, not the overview camera', () => {

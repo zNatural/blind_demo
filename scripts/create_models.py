@@ -83,22 +83,22 @@ for i,k in enumerate(keys):
     if k=='5':cube('Referencia tactil 5',(x,-.332,z-.032),(.022,.009,.005),white,.002,t)
 text('Totem marca','Los catadores de Uva\nDesafío futuro inclusivo',(0,-.278,.42),.027,white,t)
 
-# Three banks arranged around the terminal. Door 17 has an independent hinge.
-for bank_index,(bx,by,angle,start) in enumerate([(0,3.9,0,1),(-4,1.8,math.pi/2,13),(4,1.8,-math.pi/2,25)]):
+# Two frontal banks flank the unchanged central terminal. Door 17 keeps its hinge.
+for bank_index,(bx,by,angle,start) in enumerate([(-1.6,0,0,1),(1.6,0,0,13)]):
     bank=empty('Bank_'+str(bank_index));
-    cube('Fondo interior',(0,.66,1.4),(3.08,.065,2.8),dark,parent=bank)
-    for x in [-1.51,1.51]:
+    cube('Fondo interior',(0,.66,1.4),(2.36,.065,2.8),dark,parent=bank)
+    for x in [-1.15,1.15]:
         cube('Lateral carcasa',(x,.30,1.4),(.065,.74,2.8),steel,parent=bank)
-    for z in [.07,.24,1.04,1.84,2.64,2.77]:
-        cube('Estante',(0,.30,z),(3.08,.74,.045),steel,parent=bank)
-    for x in [-.72,0,.72]:
+    for z in [.07,.24,.84,1.44,2.04,2.64,2.77]:
+        cube('Estante',(0,.30,z),(2.36,.74,.045),steel,parent=bank)
+    for x in [-.36,.36]:
         cube('Division vertical',(x,.30,1.44),(.035,.74,2.4),steel,parent=bank)
-    cube('Luz casilleros',(0,-.09,2.75),(2.85,.08,.035),light,parent=bank)
-    for row in range(3):
-        for col in range(4):
-            num=start+row*4+col;x=(col-1.5)*.72;z=2.24-row*.80
+    cube('Luz casilleros',(0,-.09,2.75),(2.18,.08,.035),light,parent=bank)
+    for row in range(4):
+        for col in range(3):
+            num=start+row*3+col;x=(col-1)*.72;z=2.34-row*.60
             hinge=empty('DoorPivot_'+str(num),(x-.34,-.13,z));hinge.parent=bank
-            cube('Door_'+str(num),(.34,0,0),(.684,.065,.755),yellow if num==17 else door,parent=hinge)
+            cube('Door_'+str(num),(.34,0,0),(.684,.065,.555),yellow if num==17 else door,parent=hinge)
             text('RaisedNumber_'+str(num),str(num).zfill(2),(.34,-.042,.06),.14,dark if num==17 else white,hinge)
             cube('Manilla_'+str(num),(.60,-.065,-.12),(.028,.06,.18),dark,.006,hinge)
             # Tactile markers below the raised number.
@@ -123,13 +123,10 @@ def tile(x,y,warning=False,rotate=False):
             size=(.39,.032,.022) if rotate else (.032,.39,.022)
             loc=(x,y+(a-1.5)*.105,.058) if rotate else (x+(a-1.5)*.105,y,.058)
             cube('Relieve direccional',loc,size,yellow,.006)
-for i in range(10):tile(0,-5.5+i*.5)
-for x in [-.5,0,.5]:
-    for y in [-1,-.5]:tile(x,y,True)
-for i in range(1,8):tile(-i*.5,-.5,rotate=True);tile(i*.5,-.5,rotate=True)
-for i in range(5):tile(-3.5,i*.5);tile(3.5,i*.5)
-for i in range(1,8):tile(1,i*.5)
-for x,y in [(-3.5,1.5),(3.5,1.5),(1,3)]:tile(x,y,True)
+# A continuous T: entrance stem and lateral guidance in front of both banks.
+for i in range(9):tile(0,-5.5+i*.5)
+for i in range(-6,7):
+    tile(i*.5,-1,warning=(i in [-3,0,3]),rotate=True)
 
 cube('Suelo',(0,0,-.1),(12,14,.18),floor)
 cube('Pared fondo',(0,4.6,1.9),(12,.15,3.8),steel)
@@ -141,7 +138,7 @@ for x in [-4.5,4.5]:
     for s in range(4):cube('Liston banca',(x,-3+s*.12,.5),(1.8,.10,.07),wood)
     for dx in [-.7,.7]:cube('Pata banca',(x+dx,-2.82,.25),(.07,.5,.5),steel)
 text('Senaletica','RETIRO DE PEDIDOS',(0,4.50,3.32),.24,white)
-text('Senaletica secundaria','01 - 12',(0,4.49,3.0),.10,yellow)
+text('Senaletica secundaria','01 - 12     /     13 - 24',(0,4.49,3.0),.10,yellow)
 
 bpy.ops.object.camera_add(location=(9,-12,9))
 cam=bpy.context.object;cam.name='Camera Demo';cam.rotation_euler=(Vector((0,0,0.8))-cam.location).to_track_quat('-Z','Y').to_euler();scene.camera=cam

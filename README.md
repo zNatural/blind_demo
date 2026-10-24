@@ -1,6 +1,6 @@
 # Los catadores de Uva - Desafío futuro inclusivo
 
-Juego 3D desarrollado por **Los catadores de Uva**, titulado **Desafío futuro inclusivo**, sobre un centro de retiro accesible. Three.js carga modelos creados en Blender mediante Blender MCP, con casilleros en torno a un tótem central, teclado 0–9, retroceso, OK y suelo podotáctil.
+Juego 3D desarrollado por **Los catadores de Uva**, titulado **Desafío futuro inclusivo**, sobre un centro de retiro accesible. Three.js carga modelos creados en Blender mediante Blender MCP, con 24 casilleros en dos módulos frontales a ambos lados del tótem central, con recorrido en T y el mismo suelo de 12 × 14 metros, teclado 0–9, retroceso, OK y suelo podotáctil.
 
 ## Ejecutar
 
@@ -16,7 +16,7 @@ Abre la dirección local que muestra Vite. `npm run build` genera `dist/`; `npm 
 1. En el diálogo inicial elige si quieres activar el audio y, opcionalmente, el micrófono. También puedes continuar sin dispositivos.
 2. Presiona **Comenzar recorrido** y camina con **WASD** o las flechas hasta el tótem. Arrastra para mirar; la cámara gira sobre tu posición.
 3. Ingresa **2026** con el teclado de la interfaz, el teclado físico o los botones 3D y confirma con **OK**.
-4. Camina por la guía hasta el **casillero 17**, en el módulo izquierdo. La puerta se abre cuando llegas.
+4. Camina por la guía hasta el **casillero 17**, en el módulo derecho. La puerta se abre cuando llegas.
 5. Presiona **Retirar paquete**, pulsa **E** o haz clic en el paquete.
 
 El desplazamiento es manual. Las interacciones solo se habilitan cerca del tótem o del casillero; **Enter** confirma el código cuando la escena tiene el foco. La vista general conserva tu posición al volver a primera persona.

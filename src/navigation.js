@@ -2,7 +2,7 @@
 export const PLAYER_RADIUS = .22;
 export const WALK_SPEED = 1.8;
 export const START_POSITION = { x: 0, z: 5.3 };
-export const LOCKER_POSITION = { x: -3.87, z: -.72 };
+export const LOCKER_POSITION = { x: 1.6, z: .13 };
 
 export function movementDelta(keys, yaw, seconds) {
   const forward = Number(keys.has('KeyW') || keys.has('ArrowUp')) - Number(keys.has('KeyS') || keys.has('ArrowDown'));
@@ -35,7 +35,7 @@ export function nearTerminal({ x, z }) {
 }
 
 export function nearLocker({ x, z }) {
-  return x > -3.7 && x < -2 && Math.abs(z - LOCKER_POSITION.z) < .7;
+  return Math.abs(x - LOCKER_POSITION.x) < .55 && z > .55 && z < 1.8;
 }
 
 export function spatialHint(position, yaw, destination) {

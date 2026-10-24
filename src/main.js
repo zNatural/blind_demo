@@ -86,7 +86,7 @@ drawTerminal();
 const guide = [
   'Comienza el recorrido. Camina con W A S D o las flechas y arrastra la escena para mirar. Sigue la guía amarilla hasta el tótem.',
   'Estás frente al tótem. Ingresa tu código de cuatro dígitos y presiona OK, abajo a la derecha. Puedes probar con 2026.',
-  'Código correcto. Tu pedido está en el casillero 17, en el módulo izquierdo. Camina con W A S D por la guía amarilla; te indicaré la dirección y la distancia.',
+  'Código correcto. Tu pedido está en el casillero 17, en el módulo derecho. Camina con W A S D por la guía amarilla; te indicaré la dirección y la distancia.',
   'Has llegado al casillero 17. La puerta está abierta. Presiona Retirar paquete o la tecla E para completar tu retiro.'
 ];
 
@@ -197,7 +197,7 @@ function optimize(root) {
   remove.forEach((o) => o.removeFromParent());
 }
 
-new GLTFLoader().load(`${import.meta.env.BASE_URL}models/centro-accesible.glb?v=catadores-de-uva`, (gltf) => {
+new GLTFLoader().load(`${import.meta.env.BASE_URL}models/centro-accesible.glb?v=distribucion-t`, (gltf) => {
   model = gltf.scene;
   // Blender cameras and lights are authoring aids; browser lighting is controlled here.
   const aids = [];
@@ -225,7 +225,7 @@ new GLTFLoader().load(`${import.meta.env.BASE_URL}models/centro-accesible.glb?v=
       reliefMaterials.push(object.material);
     }
   });
-  for (const name of ['Totem', 'Bank_0', 'Bank_1', 'Bank_2']) {
+  for (const name of ['Totem', 'Bank_0', 'Bank_1']) {
     const bounds = new THREE.Box3().setFromObject(model.getObjectByName(name));
     obstacles.push({ minX: bounds.min.x, maxX: bounds.max.x, minZ: bounds.min.z, maxZ: bounds.max.z });
   }
