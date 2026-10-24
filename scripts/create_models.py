@@ -3,15 +3,16 @@ import bpy, math, os
 from mathutils import Vector
 
 ROOT = r'C:\Users\Ntrl\Documents\ChatGPT\blind_demo'
-previous = bpy.data.scenes.get('Retiro accesible')
-scene = bpy.data.scenes.new('Retiro accesible')
+SCENE_NAME = 'Los catadores de Uva - Desafío futuro inclusivo'
+previous = bpy.data.scenes.get(SCENE_NAME) or bpy.data.scenes.get('Retiro accesible')
+scene = bpy.data.scenes.new(SCENE_NAME)
 bpy.context.window.scene = scene
 if previous:
     for obj in list(previous.objects):
         if len(obj.users_scene) == 1:
             bpy.data.objects.remove(obj, do_unlink=True)
     bpy.data.scenes.remove(previous)
-scene.name = 'Retiro accesible'
+scene.name = SCENE_NAME
 
 def material(name, color, metal=0, rough=.5, emission=0):
     m = bpy.data.materials.new(name)
@@ -80,7 +81,7 @@ for i,k in enumerate(keys):
     cube('Key_'+k,(x,-.292,z),(.105,.055,.091),green if k=='OK' else dark,.008,t)
     text('Label_'+k,'<' if k=='BACK' else k,(x,-.326,z),.041,white,t)
     if k=='5':cube('Referencia tactil 5',(x,-.332,z-.032),(.022,.009,.005),white,.002,t)
-text('Totem marca','NODO / 01',(0,-.278,.42),.037,white,t)
+text('Totem marca','Los catadores de Uva\nDesafío futuro inclusivo',(0,-.278,.42),.027,white,t)
 
 # Three banks arranged around the terminal. Door 17 has an independent hinge.
 for bank_index,(bx,by,angle,start) in enumerate([(0,3.9,0,1),(-4,1.8,math.pi/2,13),(4,1.8,-math.pi/2,25)]):

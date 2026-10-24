@@ -2,7 +2,7 @@
 
 ## Project Structure & Module Organization
 
-This repository contains NODO, a Spanish-language Three.js demo of an accessible parcel pickup center. `index.html` defines the interface; `src/main.js` handles rendering, navigation, keypad input, pickup state, and browser speech APIs. `src/style.css` contains responsive layouts and visual styles. Blender assets live in `public/models/`: the editable `.blend` scene and the exported `.glb` loaded by the browser. `scripts/create_models.py` generates the models through Blender's Python API.
+This repository contains Desafío futuro inclusivo by Los catadores de Uva, a Spanish-language Three.js demo of an accessible parcel pickup center. `index.html` defines the interface; `src/main.js` handles rendering, navigation, keypad input, pickup state, and browser speech APIs. `src/style.css` contains responsive layouts and visual styles. Blender assets live in `public/models/`: the editable `.blend` scene and the exported `.glb` loaded by the browser. `scripts/create_models.py` generates the models through Blender's Python API.
 
 ## Build, Test, and Development Commands
 

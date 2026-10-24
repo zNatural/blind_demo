@@ -322,7 +322,7 @@ function collect() {
   $('collect').textContent = 'Pedido retirado ✓';
   $('start').textContent = 'Recorrido completado ✓';
   $('scene-tag').innerHTML = '<i></i> Tu pedido. Tu autonomía.';
-  speak('¡Pedido retirado! Completaste el recorrido con autonomía. Gracias por conocer Nodo. Puedes reiniciar para volver a explorar.');
+  speak('¡Pedido retirado! Completaste el recorrido con autonomía. Gracias por jugar Desafío futuro inclusivo, de Los catadores de Uva. Puedes reiniciar para volver a explorar.');
 }
 
 function reset() {

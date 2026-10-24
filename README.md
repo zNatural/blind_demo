@@ -1,6 +1,6 @@
-# NODO — Retiro sin barreras
+# Los catadores de Uva - Desafío futuro inclusivo
 
-Demo 3D local de un centro de retiro accesible. Three.js carga modelos creados en Blender mediante Blender MCP, con casilleros en torno a un tótem central, teclado 0–9, retroceso, OK y suelo podotáctil.
+Juego 3D desarrollado por **Los catadores de Uva**, titulado **Desafío futuro inclusivo**, sobre un centro de retiro accesible. Three.js carga modelos creados en Blender mediante Blender MCP, con casilleros en torno a un tótem central, teclado 0–9, retroceso, OK y suelo podotáctil.
 
 ## Ejecutar
 
